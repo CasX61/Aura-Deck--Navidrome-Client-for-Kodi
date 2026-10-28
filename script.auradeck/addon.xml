@@ -26,7 +26,8 @@
         <!-- Keeps the widget plugin's interpreter (and its response cache) warm between calls -->
         <reuselanguageinvoker>true</reuselanguageinvoker>
         <license>GPL-3.0-or-later</license>
-        <website>https://www.navidrome.org</website>
+        <website>https://github.com/CasX61/Aura-Deck--Navidrome-Client-for-Kodi</website>
+        <source>https://github.com/CasX61/Aura-Deck--Navidrome-Client-for-Kodi</source>
         <news>1.0.0: First release.</news>
         <assets>
             <icon>icon.png</icon>
