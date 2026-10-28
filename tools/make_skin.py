@@ -14,6 +14,7 @@ same sources the Python code uses.
 
 import importlib.util
 import os
+import re
 from xml.dom import minidom
 
 from i18n import ADDON, string_id
@@ -37,7 +38,8 @@ DARK = 'FF0B0C14'
 HOVER = '1FFFFFFF'
 FOCUS_ROW = '2EFFFFFF'
 
-# Fonts: Estuary names. Kodi falls back to font13 in skins that lack one.
+# Fonts: Estuary names. At runtime resources/lib/ui/skin.py maps them to the
+# active skin's closest fonts; a new name needs an entry in its ESTUARY table.
 F_SMALL = 'font10'
 F_BODY = 'font12'
 F_ITEM = 'font13'
@@ -812,6 +814,19 @@ def now_playing():
             + '</controls></window>\n')
 
 
+# Kodi looks a texture name up in the active skin before the addon's media
+# folder, so a plain "logo.png" or "white.png" would show the skin's own file.
+# Every texture therefore lives in media/auradeck/ and is referenced with it.
+MEDIA_DIR = 'auradeck/'
+_TEXTURE_TAG = re.compile(r'(<(?:texture\w*|midtexture)\b[^>]*>)(?!\$)([^<]+)<')
+_TEXTURE_ATTR = re.compile(r'(\s(?:diffuse|fallback)=")(?!\$)([^"]+)"')
+
+
+def with_media_dir(source):
+    source = _TEXTURE_TAG.sub(lambda m: f'{m.group(1)}{MEDIA_DIR}{m.group(2)}<', source)
+    return _TEXTURE_ATTR.sub(lambda m: f'{m.group(1)}{MEDIA_DIR}{m.group(2)}"', source)
+
+
 def pretty(source):
     return minidom.parseString(source.encode('utf-8')).toprettyxml(indent='  ', encoding='UTF-8') \
         .decode('utf-8').replace('<?xml version="1.0" encoding="UTF-8"?>',
@@ -824,7 +839,7 @@ def main():
     for name, builder in (('script-auradeck-main.xml', main_window),
                           ('script-auradeck-nowplaying.xml', now_playing)):
         target = os.path.join(SKIN, name)
-        text = pretty(builder())
+        text = pretty(with_media_dir(builder()))
         text = '\n'.join(line for line in text.splitlines() if line.strip())
         with open(target, 'w', encoding='utf-8') as handle:
             handle.write(text + '\n')

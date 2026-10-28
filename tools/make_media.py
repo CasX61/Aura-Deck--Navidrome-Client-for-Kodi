@@ -19,7 +19,8 @@ from PIL import Image, ImageChops, ImageDraw, ImageFilter, ImageFont
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ADDON = os.path.join(ROOT, 'script.auradeck')
-MEDIA = os.path.join(ADDON, 'resources', 'skins', 'Default', 'media')
+# A subfolder, so no texture of the active skin can shadow ours (see make_skin.MEDIA_DIR)
+MEDIA = os.path.join(ADDON, 'resources', 'skins', 'Default', 'media', 'auradeck')
 FONT = os.path.join(ROOT, 'tools', 'fonts', 'MaterialIconsRound-Regular.otf')
 CODEPOINTS = os.path.join(ROOT, 'tools', 'fonts', 'MaterialIconsRound-Regular.codepoints')
 

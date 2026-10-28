@@ -128,7 +128,8 @@ script.auradeck/                 das Add-on (dieser Ordner kommt ins ZIP)
     ui/pages.py      Seiten (laden nur Daten, das Fenster zeichnet sie)
     ui/nowplaying.py „Läuft gerade“
     ui/ids.py        Control-IDs, gemeinsam mit dem Skin-Generator
-  resources/skins/Default/       generiertes Skin-XML und Grafiken
+    ui/skin.py       passt die Schriften des Fenster-XML an den aktiven Skin an
+  resources/skins/Default/       generiertes Skin-XML, Grafiken in media/auradeck/
 assets/
   icon-source.png    Original des Icons (das Addon nutzt eine 512×512-Kopie)
 LICENSE, NOTICE, LICENSES/   Lizenztexte (siehe unten)
@@ -161,12 +162,20 @@ Diese Punkte hat erst der Test im echten Kodi 21 gezeigt. Der Generator berücks
   mit „…“. Mehrzeiliger Text in Listen (Songtexte) braucht eine `textbox`.
 - Fortschrittsbalken und Schieberegler skalieren Füllung bzw. Knopf relativ zur Höhe
   der Hintergrund-Textur. Beide Texturen müssen gleich hoch sein.
+- Kodi sucht eine Textur zuerst im aktiven Skin und erst danach im Add-on. Ein Skin mit
+  eigener `logo.png` oder `white.png` überdeckt sonst unsere. Alle Grafiken liegen
+  deshalb in `media/auradeck/`, der Generator setzt den Ordner vor jeden Namen.
+- Schriftnamen gelten nur in der `Font.xml` des aktiven Skins. Andere Skins haben andere
+  Größen unter demselben Namen, Großbuchstaben-`_title`-Schriften oder gar keinen
+  passenden Namen (dann nimmt Kodi `font13`).
 
 ## Hinweise und Grenzen
 
-- Die Fenster nutzen die Schriftnamen von Estuary (`font10` … `font45`). In Skins
-  ohne diese Namen greift Kodi auf `font13` zurück. Das funktioniert, die Überschriften
-  sind dann aber kleiner.
+- Das Fenster-XML ist mit den Schriften von Estuary gebaut. Vor dem Öffnen ordnet
+  `ui/skin.py` jeder davon die Schrift des aktiven Skins mit der nächsten Größe und
+  Stärke zu und öffnet eine angepasste Kopie aus `addon_data`. Die Größen stimmen dann
+  in jedem Skin, die Schriftart selbst bleibt die des Skins. Lässt sich die `Font.xml`
+  nicht lesen, öffnet Aura-Deck sein eigenes XML.
 - Songtexte kommen aus Navidrome (eingebettet oder `.lrc`). Synchronisiert werden sie
   angezeigt, wenn der Server die OpenSubsonic-Erweiterung `songLyrics` anbietet.
 - „Beliebte Titel“ und Künstlerbiografien brauchen in Navidrome einen aktivierten
