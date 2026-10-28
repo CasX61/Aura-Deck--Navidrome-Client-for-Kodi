@@ -47,6 +47,7 @@ F_H2 = 'font30_title'
 F_H1 = 'font45'
 F_LYRIC = 'font32'
 F_LYRIC_NOW = 'font45_title'
+F_LYRIC_NOW_LONG = 'font32_title'   # current line too long for two lines of F_LYRIC_NOW
 
 # Layout
 CX = 150            # content left edge (right of the collapsed sidebar)
@@ -737,11 +738,14 @@ def now_playing():
     )
 
     synced = lyrics_state('synced')
-    lyric_h = 112
+    short_line = 'String.IsEmpty(ListItem.Property(long))'
+    # Noto Sans lines are 45 px (font32) and 63 px (font45_title) high: a row holds three
+    # lines of F_LYRIC or two of F_LYRIC_NOW. Shorter rows cut wrapped lines off with "...".
+    lyric_h = 136
     lyrics = (
         f'<control type="fixedlist" id="{ids.NP_LYRICS}"><left>{panel_x}</left><top>200</top>'
-        f'<width>{panel_w}</width><height>{lyric_h * 7}</height><orientation>vertical</orientation>'
-        '<focusposition>3</focusposition><movement>3</movement>'
+        f'<width>{panel_w}</width><height>{lyric_h * 6}</height><orientation>vertical</orientation>'
+        '<focusposition>2</focusposition><movement>2</movement>'
         '<scrolltime tween="cubic" easing="out">450</scrolltime>'
         + nav(onup=to_tab, onleft=ids.NP_PLAY)
         + _visible(f'{panel_lyrics} + {has_lyrics}')
@@ -751,7 +755,10 @@ def now_playing():
         + f'</itemlayout><focusedlayout width="{panel_w}" height="{lyric_h}">'
         + image(-20, 4, panel_w + 20, lyric_h - 8, 'round_12.png', FOCUS_ROW, border=12,
                 visible=f'Control.HasFocus({ids.NP_LYRICS})')
-        + label(0, 0, panel_w, lyric_h, '$INFO[ListItem.Label]', F_LYRIC_NOW, TEXT, visible=synced, wrap=True)
+        + label(0, 0, panel_w, lyric_h, '$INFO[ListItem.Label]', F_LYRIC_NOW, TEXT,
+                visible=f'{synced} + {short_line}', wrap=True)
+        + label(0, 0, panel_w, lyric_h, '$INFO[ListItem.Label]', F_LYRIC_NOW_LONG, TEXT,
+                visible=f'{synced} + !{short_line}', wrap=True)
         + label(0, 0, panel_w, lyric_h, '$INFO[ListItem.Label]', F_LYRIC, TEXT2, visible=f'!{synced}', wrap=True)
         + '</focusedlayout></control>'
         + label(panel_x, 420, panel_w, 60, S('np_loading'), F_ITEM, TEXT3,
