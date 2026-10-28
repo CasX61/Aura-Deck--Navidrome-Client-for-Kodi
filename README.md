@@ -157,6 +157,8 @@ Diese Punkte hat erst der Test im echten Kodi 21 gezeigt. Der Generator berücks
 - `<itemlayout condition=…>` gilt für die ganze Liste, nicht pro Eintrag. Unterschiede
   pro Eintrag entstehen über `<visible>` innerhalb eines Layouts.
 - Labels kennen `aligny` nur als `top` oder `center`.
+- Labels in Listen-Layouts brechen nie um: Kodi ignoriert dort `wrapmultiline` und kürzt
+  mit „…“. Mehrzeiliger Text in Listen (Songtexte) braucht eine `textbox`.
 - Fortschrittsbalken und Schieberegler skalieren Füllung bzw. Knopf relativ zur Höhe
   der Hintergrund-Textur. Beide Texturen müssen gleich hoch sein.
 

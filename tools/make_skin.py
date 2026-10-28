@@ -740,8 +740,17 @@ def now_playing():
     synced = lyrics_state('synced')
     short_line = 'String.IsEmpty(ListItem.Property(long))'
     # Noto Sans lines are 45 px (font32) and 63 px (font45_title) high: a row holds three
-    # lines of F_LYRIC or two of F_LYRIC_NOW. Shorter rows cut wrapped lines off with "...".
+    # lines of F_LYRIC or two of F_LYRIC_NOW.
     lyric_h = 136
+
+    def lyric_text(font, color, visible):
+        # A textbox, not a label: inside lists Kodi turns labels into single line
+        # list labels that ignore wrapmultiline and cut long lines off with "...".
+        return (f'<control type="textbox"><left>0</left><top>0</top><width>{panel_w}</width>'
+                f'<height>{lyric_h}</height><font>{font}</font><textcolor>{color}</textcolor>'
+                '<align>left</align><aligny>center</aligny><label>$INFO[ListItem.Label]</label>'
+                + _visible(visible) + '</control>')
+
     lyrics = (
         f'<control type="fixedlist" id="{ids.NP_LYRICS}"><left>{panel_x}</left><top>200</top>'
         f'<width>{panel_w}</width><height>{lyric_h * 6}</height><orientation>vertical</orientation>'
@@ -750,16 +759,14 @@ def now_playing():
         + nav(onup=to_tab, onleft=ids.NP_PLAY)
         + _visible(f'{panel_lyrics} + {has_lyrics}')
         + f'<itemlayout width="{panel_w}" height="{lyric_h}">'
-        + label(0, 0, panel_w, lyric_h, '$INFO[ListItem.Label]', F_LYRIC, TEXT3, visible=synced, wrap=True)
-        + label(0, 0, panel_w, lyric_h, '$INFO[ListItem.Label]', F_LYRIC, TEXT2, visible=f'!{synced}', wrap=True)
+        + lyric_text(F_LYRIC, TEXT3, synced)
+        + lyric_text(F_LYRIC, TEXT2, f'!{synced}')
         + f'</itemlayout><focusedlayout width="{panel_w}" height="{lyric_h}">'
         + image(-20, 4, panel_w + 20, lyric_h - 8, 'round_12.png', FOCUS_ROW, border=12,
                 visible=f'Control.HasFocus({ids.NP_LYRICS})')
-        + label(0, 0, panel_w, lyric_h, '$INFO[ListItem.Label]', F_LYRIC_NOW, TEXT,
-                visible=f'{synced} + {short_line}', wrap=True)
-        + label(0, 0, panel_w, lyric_h, '$INFO[ListItem.Label]', F_LYRIC_NOW_LONG, TEXT,
-                visible=f'{synced} + !{short_line}', wrap=True)
-        + label(0, 0, panel_w, lyric_h, '$INFO[ListItem.Label]', F_LYRIC, TEXT2, visible=f'!{synced}', wrap=True)
+        + lyric_text(F_LYRIC_NOW, TEXT, f'{synced} + {short_line}')
+        + lyric_text(F_LYRIC_NOW_LONG, TEXT, f'{synced} + !{short_line}')
+        + lyric_text(F_LYRIC, TEXT2, f'!{synced}')
         + '</focusedlayout></control>'
         + label(panel_x, 420, panel_w, 60, S('np_loading'), F_ITEM, TEXT3,
                 visible=f'{panel_lyrics} + {lyrics_state("loading")}')
